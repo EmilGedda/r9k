@@ -8,7 +8,15 @@ endif()
 
 include("cmake/Doctest.cmake")
 
-add_executable(perfect-hash "src/main.cpp")
+add_executable(exe "src/main.cpp")
+set_target_properties(exe PROPERTIES OUTPUT_NAME "r9k")
+
+
+add_library(r9k INTERFACE)
+target_include_directories(r9k INTERFACE "inc")
+target_compile_features(r9k INTERFACE cxx_std_17)
+
+target_link_libraries(exe PRIVATE r9k)
 
 file(GLOB_RECURSE test_sources CONFIGURE_DEPENDS "inc/**/*_tests.cpp")
 add_executable(tests ${test_sources})
@@ -16,6 +24,7 @@ target_compile_features(tests PRIVATE cxx_std_17)
 
 target_link_libraries(tests
   PRIVATE
+    r9k
     doctest
     $<$<STREQUAL:"${CMAKE_BUILD_TYPE}","Coverage">:gcov>
     $<$<VERSION_LESS:"${CMAKE_VERSION}",3.13>:--coverage>
